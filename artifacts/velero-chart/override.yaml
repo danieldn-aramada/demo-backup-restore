@@ -1,0 +1,43 @@
+initContainers:
+- name: velero-plugin-for-aws
+  image: velero/velero-plugin-for-aws:v1.12.1
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+    - mountPath: /target
+      name: plugins
+- name: velero-plugin-for-microsoft-azure 
+  image: velero/velero-plugin-for-microsoft-azure:v1.11.0
+  imagePullPolicy: IfNotPresent
+  volumeMounts:
+    - mountPath: /target
+      name: plugins
+
+credentials:
+  name: ""
+  useSecret: true
+  existingSecret: cloud-credentials
+  secretContents: {}
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 128Mi
+  limits:
+    cpu: 2 
+    memory: 2Gi
+
+deployNodeAgent: true
+nodeAgent:
+  tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
+
+configuration:
+  features: EnableCSI
+  repositoryMaintenanceJob:
+    latestJobsCount: 0
+  defaultRepoMaintainFrequency: 12h
+  backupStorageLocation: []
+  volumeSnapshotLocation: []
+
